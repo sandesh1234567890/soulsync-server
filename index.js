@@ -8,6 +8,22 @@ app.use(cors());
 
 const server = http.createServer(app);
 
+// Keep-alive ping endpoint
+app.get('/ping', (req, res) => {
+  res.status(200).send('pong');
+});
+
+// 24/7 Keep Awake: Self-pinging routine every 10 minutes to prevent Render Free Tier from sleeping
+setInterval(() => {
+  const https = require('https');
+  https.get('https://soulsync-wallpaper-server.onrender.com/ping', (res) => {
+    console.log('Keep-alive ping success: status code', res.statusCode);
+  }).on('error', (err) => {
+    console.error('Keep-alive ping failed:', err.message);
+  });
+}, 10 * 60 * 1000); // 10 minutes
+
+
 const io = new Server(server, {
   cors: {
     origin: '*',
